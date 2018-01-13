@@ -1,3 +1,5 @@
+import steam.build.Nexus
+
 name := "play-statsd"
     
 organization := "com.typesafe.play.plugins"
