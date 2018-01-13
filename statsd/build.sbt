@@ -18,11 +18,11 @@ parallelExecution in Test := false
 
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
 
-publishTo <<= (version) { version: String =>
-  val nexus = "https://private-repo.typesafe.com/typesafe/"
-  if (version.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "maven-snapshots/") 
-  else                                   Some("releases"  at nexus + "maven-releases/")
-}
+resolvers ++= Nexus.repoUrls
+
+publishTo := Nexus.publishUrl
+
+credentials += Credentials("Sonatype Nexus Repository Manager", Nexus.host, Nexus.username, Nexus.password)
  
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked", "-Xlint:deprecation", "-encoding", "UTF-8")
 
