@@ -1,12 +1,12 @@
 import steam.build.Nexus
 
-name := "play-statsd"
+name := "play-statsd-play25"
     
 organization := "com.gmi_mr.play.plugins"
 
-version := Nexus.latest("2.5.0")
+version := Nexus.latest("253.0")
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.12"
 
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
@@ -36,13 +36,13 @@ lazy val sample = (project in file("sample/sample-statsd"))
   .enablePlugins(PlayScala)
   .settings(
     Keys.fork in Test := false,
-    scalaVersion := "2.11.7",
+    scalaVersion := "2.11.12",
     scalacOptions += "-deprecation",
     routesGenerator := StaticRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "com.typesafe.play" %% "play" % "2.5.0" % "provided",
-      "com.typesafe.play"  %% "play-test" % "2.5.0" % "test",
+      "com.typesafe.play" %% "play" % "2.5.18" % "provided",
+      "com.typesafe.play"  %% "play-test" % "2.5.18" % "test",
       specs2 % "test"
     )
   ).dependsOn(root).aggregate(root)
