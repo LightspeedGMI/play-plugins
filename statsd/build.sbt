@@ -2,9 +2,9 @@ import steam.build.Nexus
 
 name := "play-statsd"
     
-organization := "com.typesafe.play.plugins"
+organization := "com.gmi_mr.play.plugins"
 
-version := "2.5.0"
+version := Nexus.latest("2.5.0")
 
 scalaVersion := "2.11.1"
 
