@@ -1,6 +1,6 @@
 import steam.build.Nexus
 
-name := "play-statsd-play25"
+name := "play-statsd-play26"
     
 organization := "com.gmi_mr.play.plugins"
 
@@ -11,8 +11,8 @@ scalaVersion := "2.11.12"
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play" % "2.5.18" % "provided",
-  "com.typesafe.play"  %% "play-test" % "2.5.18" % "test",
+  "com.typesafe.play" %% "play" % "2.6.11" % "provided",
+  "com.typesafe.play"  %% "play-test" % "2.6.11" % "test",
   specs2 % "test"
 )
 
@@ -41,8 +41,8 @@ lazy val sample = (project in file("sample/sample-statsd"))
     routesGenerator := StaticRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
-      "com.typesafe.play" %% "play" % "2.5.18" % "provided",
-      "com.typesafe.play"  %% "play-test" % "2.5.18" % "test",
+      "com.typesafe.play" %% "play" % "2.6.11" % "provided",
+      "com.typesafe.play"  %% "play-test" % "2.6.11" % "test",
       specs2 % "test"
     )
   ).dependsOn(root).aggregate(root)
