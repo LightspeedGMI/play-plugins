@@ -4,7 +4,7 @@ import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent.Future
 
-object Application extends Controller {
+class Application extends Controller {
   def index = Action {
     Thread.sleep(2)
     Ok

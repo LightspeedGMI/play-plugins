@@ -3,94 +3,119 @@ package test
 import java.net.{SocketTimeoutException, DatagramPacket, DatagramSocket}
 import org.specs2.mutable._
 import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import play.api.test._
-import org.specs2.execute.{AsResult, Result}
 import collection.mutable.ListBuffer
-import play.api.libs.ws.WS
 import concurrent.Await
 import concurrent.duration.Duration
 
 object IntegrationTestSpec extends Specification {
   "statsd filters" should {
 
-    "report stats on /" in new Setup {
-      makeRequest("/")
-      receive(count("sample.routes.get"), timing("sample.routes.get"), combinedTime, combinedSuccess, combined200)
+    "report stats on /" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/")
+        receive(count("sample.routes.get"), timing("sample.routes.get"), combinedTime, combinedSuccess, combined200)
+      }
     }
 
-    "report stats on simple path" in new Setup {
-      makeRequest("/foo/bar")
-      receive(count("sample.routes.foo.bar.get"), timing("sample.routes.foo.bar.get"), combinedTime, combinedSuccess, combined200)
+    "report stats on simple path" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/foo/bar")
+        receive(count("sample.routes.foo.bar.get"), timing("sample.routes.foo.bar.get"), combinedTime, combinedSuccess, combined200)
+      }
     }
 
-    "report stats on path with dynamic end" in new Setup {
-      makeRequest("/single/end/blah")
-      receive(count("sample.routes.single.end.param.get"), timing("sample.routes.single.end.param.get"), combinedTime, combinedSuccess, combined200)
+    "report stats on path with dynamic end" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/single/end/blah")
+        receive(count("sample.routes.single.end.param.get"), timing("sample.routes.single.end.param.get"), combinedTime, combinedSuccess, combined200)
+      }
     }
 
-    "report stats on path with dynamic middle" in new Setup {
-      makeRequest("/single/middle/blah/f")
-      receive(count("sample.routes.single.middle.param.f.get"), timing("sample.routes.single.middle.param.f.get"), combinedTime, combinedSuccess, combined200)
+    "report stats on path with dynamic middle" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/single/middle/blah/f")
+        receive(count("sample.routes.single.middle.param.f.get"), timing("sample.routes.single.middle.param.f.get"), combinedTime, combinedSuccess, combined200)
+      }
     }
 
-    "report stats on path with regex" in new Setup {
-      makeRequest("/regex/21")
-      receive(count("sample.routes.regex.param.get"), timing("sample.routes.regex.param.get"), combinedTime, combinedSuccess, combined200)
+    "report stats on path with regex" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/regex/21")
+        receive(count("sample.routes.regex.param.get"), timing("sample.routes.regex.param.get"), combinedTime, combinedSuccess, combined200)
+      }
     }
 
-    "report stats on path with wildcard" in new Setup {
-      makeRequest("/rest/blah/blah")
-      receive(count("sample.routes.rest.param.get"), timing("sample.routes.rest.param.get"), combinedTime, combinedSuccess, combined200)
+    "report stats on path with wildcard" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/rest/blah/blah")
+        receive(count("sample.routes.rest.param.get"), timing("sample.routes.rest.param.get"), combinedTime, combinedSuccess, combined200)
+      }
     }
 
-    "report stats on path with multiple params" in new Setup {
-      makeRequest("/multiple/foo/bar")
-      receive(count("sample.routes.multiple.param1.param2.get"), timing("sample.routes.multiple.param1.param2.get"), combinedTime, combinedSuccess, combined200)
+    "report stats on path with multiple params" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/multiple/foo/bar")
+        receive(count("sample.routes.multiple.param1.param2.get"), timing("sample.routes.multiple.param1.param2.get"), combinedTime, combinedSuccess, combined200)
+      }
     }
 
-    "report stats on async action" in new Setup {
-      makeRequest("/async")
-      receive(count("sample.routes.async.get"), timing("sample.routes.async.get"), combinedTime, combinedSuccess, combined200)
+    "report stats on async action" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/async")
+        receive(count("sample.routes.async.get"), timing("sample.routes.async.get"), combinedTime, combinedSuccess, combined200)
+      }
     }
 
-    "report stats on failure" in new Setup {
-      makeWsRequest("/sync/failure")(fakeApp)
-      receive(count("sample.routes.sync.failure.get"), timing("sample.routes.sync.failure.get"), combinedTime, combinedError, combined500)
+    "report stats on failure" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeWsRequest("/sync/failure")(app)
+        receive(count("sample.routes.sync.failure.get"), timing("sample.routes.sync.failure.get"), combinedTime, combinedError, combined500)
+      }
     }
 
-    "report stats on failure thrown in async" in new Setup {
-      makeWsRequest("/async/failure")(fakeApp)
-      receive(count("sample.routes.async.failure.get"), timing("sample.routes.async.failure.get"), combinedTime, combinedError, combined500)
+    "report stats on failure thrown in async" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeWsRequest("/async/failure")(app)
+        receive(count("sample.routes.async.failure.get"), timing("sample.routes.async.failure.get"), combinedTime, combinedError, combined500)
+      }
     }
 
-    "report stats on action returning 503" in new Setup {
-      makeRequest("/error", 503)
-      receive(count("sample.routes.error.get"), timing("sample.routes.error.get"), combinedTime, combinedError, combined503)
+    "report stats on action returning 503" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeRequest(app, "/error", 503)
+        receive(count("sample.routes.error.get"), timing("sample.routes.error.get"), combinedTime, combinedError, combined503)
+      }
     }
 
-    "report stats on handlerNotFound" in new Setup {
-      makeWsRequest("/does/not/exist", 404)(fakeApp)
-      receive(count("sample.routes.combined.handlerNotFound"), timing("sample.routes.combined.handlerNotFound", 0), timing("sample.routes.combined.time", 0), combinedSuccess, combined404)
+    "report stats on handlerNotFound" in new WithApplication(new GuiceApplicationBuilder().configure(config).build()) with Setup {
+      running(TestServer(9001, app)) {
+        makeWsRequest("/does/not/exist", 404)(app)
+        receive(count("sample.routes.combined.handlerNotFound"), timing("sample.routes.combined.handlerNotFound", 0), timing("sample.routes.combined.time", 0), combinedSuccess, combined404)
+      }
     }
-
   }
 
-  def makeRequest(path: String, expectedStatus: Int = 200) {
-    status(route(FakeRequest("GET", path)).get) must_== expectedStatus
+  def makeRequest(app: Application, path: String, expectedStatus: Int = 200) {
+    status(route(app, FakeRequest("GET", path)).get) must_== expectedStatus
   }
 
   def makeWsRequest(path: String, expectedStatus: Int = 500)(implicit app: Application) {
-    Await.result(WS.url("http://localhost:9001" + path).get(), Duration.apply("2s")).status must_== expectedStatus
+    WsTestClient.withClient { wsClient =>
+      Await.result(wsClient.url("http://localhost:9001" + path).get(), Duration.apply("2s")).status must_== expectedStatus
+    }
   }
 
-  trait Setup extends Around {
-    lazy val PORT = 57476
-    implicit lazy val fakeApp = FakeApplication(additionalConfiguration = Map(
-      "statsd.enabled" -> "true",
-      "statsd.host" -> "localhost",
-      "statsd.port" -> PORT.toString,
-      "statsd.stat.prefix" -> "sample"))
+  lazy val PORT = 57476
+  lazy val config = Map(
+    "statsd.enabled" -> "true",
+    "statsd.host" -> "localhost",
+    "statsd.port" -> PORT.toString,
+    "statsd.stat.prefix" -> "sample"
+  )
+  trait Setup extends BeforeAfter {
     lazy val mockStatsd = {
       val socket = new DatagramSocket(PORT)
       socket.setSoTimeout(2000)
@@ -121,14 +146,12 @@ object IntegrationTestSpec extends Specification {
       expects must beEmpty
     }
 
-
-    def around[T](t: => T)(implicit evidence$1: AsResult[T]) = running(TestServer(9001, fakeApp)) {
+    def before {
       mockStatsd
-      try {
-        AsResult(t)
-      } finally {
-        mockStatsd.close()
-      }
+    }
+
+    def after {
+      mockStatsd.close()
     }
   }
 

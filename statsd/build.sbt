@@ -13,6 +13,9 @@ resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/release
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play" % "2.6.11" % "provided",
   "com.typesafe.play"  %% "play-test" % "2.6.11" % "test",
+  "org.specs2" %% "specs2-core" % "4.0.2",
+  "org.specs2" %% "specs2-junit" % "4.0.2",
+  "org.specs2" %% "specs2-mock" % "4.0.2",
   specs2 % "test"
 )
 
@@ -38,11 +41,13 @@ lazy val sample = (project in file("sample/sample-statsd"))
     Keys.fork in Test := false,
     scalaVersion := "2.11.12",
     scalacOptions += "-deprecation",
-    routesGenerator := StaticRoutesGenerator,
     libraryDependencies ++= Seq(
       ws,
       "com.typesafe.play" %% "play" % "2.6.11" % "provided",
       "com.typesafe.play"  %% "play-test" % "2.6.11" % "test",
+      "org.specs2" %% "specs2-core" % "4.0.2",
+      "org.specs2" %% "specs2-junit" % "4.0.2",
+      "org.specs2" %% "specs2-mock" % "4.0.2",
       specs2 % "test"
     )
   ).dependsOn(root).aggregate(root)

@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import play.Application;
 import play.modules.statsd.function.Function0;
-import play.test.FakeApplication;
 import play.test.Helpers;
 
 import java.io.IOException;
