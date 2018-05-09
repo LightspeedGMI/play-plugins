@@ -1,4 +1,6 @@
 import steam.build.Nexus
+import com.amazonaws.auth._
+import com.amazonaws.auth.profile._
 
 name := "play-statsd-play26"
     
@@ -23,16 +25,19 @@ parallelExecution in Test := false
 
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
 
-resolvers ++= Nexus.repoUrls
+resolvers ++= Nexus.repoUrls.value
 
-publishTo := Nexus.publishUrl
+publishTo := Nexus.publishUrl.value
 
 credentials += Credentials("Sonatype Nexus Repository Manager", Nexus.host, Nexus.username, Nexus.password)
- 
+s3credentials := new ProfileCredentialsProvider(awsProfile.value) | new EnvironmentVariableCredentialsProvider() | new InstanceProfileCredentialsProvider() | new ContainerCredentialsProvider()
+
+publishMavenStyle := false
+
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked", "-Xlint:deprecation", "-encoding", "UTF-8")
 
 scalacOptions += "-deprecation"
-  
+
 lazy val root = project in file(".")
 
 lazy val sample = (project in file("sample/sample-statsd"))
